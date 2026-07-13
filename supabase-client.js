@@ -97,14 +97,12 @@ if (supabaseUrl && supabaseKey) {
         }
         users.push({ email, password });
         saveUsers(users);
-        // Simulate email confirmation flow: return null session, requiring they sign in
         return { data: { session: null }, error: null };
       },
       signInWithPassword: async ({ email, password }) => {
         const users = getUsers();
         const user = users.find(u => u.email === email && u.password === password);
         if (!user) {
-          // If no users exist at all yet, auto-create the first one as a convenience!
           if (users.length === 0) {
             users.push({ email, password });
             saveUsers(users);
@@ -124,69 +122,105 @@ if (supabaseUrl && supabaseKey) {
       }
     },
     from: (table) => {
-      if (table !== 'tasks') {
-        throw new Error(`Unsupported mock table: ${table}`);
-      }
-      return {
-        select: async () => {
-          return { data: getTasks(), error: null };
-        },
-        upsert: async (row) => {
-          const tasks = getTasks();
-          const rows = Array.isArray(row) ? row : [row];
-          let updatedRows = [];
-          
-          rows.forEach(r => {
-            const idx = tasks.findIndex(t => t.id === r.id);
-            if (idx >= 0) {
-              tasks[idx] = { ...tasks[idx], ...r };
-              updatedRows.push({ type: 'UPDATE', row: tasks[idx] });
-            } else {
-              tasks.push(r);
-              updatedRows.push({ type: 'INSERT', row: r });
-            }
-          });
-          
-          saveTasks(tasks);
-          
-          // Trigger realtime listeners
-          updatedRows.forEach(({ type, row }) => {
-            listeners.forEach(listener => {
-              if (listener.table === 'tasks') {
-                listener.callback({
-                  eventType: type,
-                  new: row,
-                  old: type === 'UPDATE' ? { id: row.id } : null
-                });
+      if (table === 'tasks') {
+        return {
+          select: async () => {
+            return { data: getTasks(), error: null };
+          },
+          upsert: async (row) => {
+            const tasks = getTasks();
+            const rows = Array.isArray(row) ? row : [row];
+            let updatedRows = [];
+            
+            rows.forEach(r => {
+              const idx = tasks.findIndex(t => t.id === r.id);
+              if (idx >= 0) {
+                tasks[idx] = Object.assign({}, tasks[idx], r);
+                updatedRows.push({ type: 'UPDATE', row: tasks[idx] });
+              } else {
+                tasks.push(r);
+                updatedRows.push({ type: 'INSERT', row: r });
               }
             });
-          });
-          
-          return { error: null };
-        },
-        delete: () => {
-          return {
-            eq: async (col, val) => {
-              if (col !== 'id') throw new Error(`Unsupported mock delete filter: ${col}`);
-              const tasks = getTasks();
-              const filtered = tasks.filter(t => t.id !== val);
-              saveTasks(filtered);
-              
-              // Trigger realtime listeners
+            
+            saveTasks(tasks);
+            
+            // Trigger realtime listeners
+            updatedRows.forEach(({ type, row }) => {
               listeners.forEach(listener => {
                 if (listener.table === 'tasks') {
                   listener.callback({
-                    eventType: 'DELETE',
-                    old: { id: val }
+                    eventType: type,
+                    new: row,
+                    old: type === 'UPDATE' ? { id: row.id } : null
                   });
                 }
               });
-              
-              return { error: null };
-            }
-          };
-        }
-      };
+            });
+            
+            return { error: null };
+          },
+          delete: () => {
+            return {
+              eq: async (col, val) => {
+                if (col !== 'id') throw new Error(`Unsupported mock delete filter: ${col}`);
+                const tasks = getTasks();
+                const filtered = tasks.filter(t => t.id !== val);
+                saveTasks(filtered);
+                
+                // Trigger realtime listeners
+                listeners.forEach(listener => {
+                  if (listener.table === 'tasks') {
+                    listener.callback({
+                      eventType: 'DELETE',
+                      old: { id: val }
+                    });
+                  }
+                });
+                
+                return { error: null };
+              }
+            };
+          }
+        };
+      } else if (table === 'projects') {
+        return {
+          select: async () => {
+            const data = localStorage.getItem('studio_projects');
+            return { data: data ? JSON.parse(data) : [], error: null };
+          },
+          upsert: async (row) => {
+            return { error: null };
+          },
+          delete: () => {
+            return {
+              eq: async (col, val) => {
+                return { error: null };
+              }
+            };
+          }
+        };
+      } else if (table === 'team_members') {
+        return {
+          select: async () => {
+            const data = localStorage.getItem('studio_team');
+            const list = data ? JSON.parse(data) : [];
+            return { data: list.map(name => ({ id: name, name: name })), error: null };
+          },
+          upsert: async (row) => {
+            return { error: null };
+          },
+          delete: () => {
+            return {
+              eq: async (col, val) => {
+                return { error: null };
+              }
+            };
+          }
+        };
+      } else {
+        throw new Error(`Unsupported mock table: ${table}`);
+      }
     },
     channel: (name) => {
       const channelListeners = [];
