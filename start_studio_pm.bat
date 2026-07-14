@@ -4,7 +4,7 @@ echo ==================================================
 echo         NAUGHTY SOCIETY - STUDIO PM
 echo ==================================================
 echo.
-echo Starting local web server on port 9000...
+echo Starting local web server on port 9100...
 
 :: Check if python is installed
 where python >nul 2>&1
@@ -15,15 +15,15 @@ if %errorlevel% neq 0 (
     exit /b
 )
 
-:: Start the Python HTTP server in a separate background window
-start "NS Studio PM Server" /min python -m http.server 9000
+:: Start the Python HTTP server on port 9100 in a separate background window
+start "NS Studio PM Server" /min python -m http.server 9100
 
-:: Wait 1 second for server to initialize (highly robust ping delay)
+:: Wait 1 second for server to initialize
 ping -n 2 127.0.0.1 >nul
 
 :: Open browser
 echo Launching Studio PM in default browser...
-start http://localhost:9000/index.html
+start http://localhost:9100/index.html
 
 echo.
 echo Local server is running in the background.
