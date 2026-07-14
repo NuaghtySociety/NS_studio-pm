@@ -18,8 +18,8 @@ if %errorlevel% neq 0 (
 :: Start the Python HTTP server in a separate background window
 start "NS Studio PM Server" /min python -m http.server 9000
 
-:: Wait 1 second for server to initialize
-timeout /t 1 /nobreak >nul
+:: Wait 1 second for server to initialize (highly robust ping delay)
+ping -n 2 127.0.0.1 >nul
 
 :: Open browser
 echo Launching Studio PM in default browser...
@@ -28,5 +28,5 @@ start http://localhost:9000/index.html
 echo.
 echo Local server is running in the background.
 echo You can close this launcher window now.
-timeout /t 3 >nul
+ping -n 3 127.0.0.1 >nul
 exit
