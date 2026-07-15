@@ -14,7 +14,7 @@ if (githubPat && githubPat.trim() !== '') {
   console.log('[Supabase Client] GitHub PAT found! Initializing GitHub Issues Database Engine...');
   
   const headers = {
-    'Authorization': `token ${githubPat.trim()}`,
+    'Authorization': 'Bearer ' + githubPat.trim(),
     'Accept': 'application/vnd.github.v3+json',
     'Content-Type': 'application/json'
   };
@@ -39,12 +39,13 @@ if (githubPat && githubPat.trim() !== '') {
   client = {
     auth: {
       getSession: async () => {
-        // Mock a persistent session for the logged-in user
-        const email = 'github-team@naughtysociety.ai';
+        const localSess = localStorage.getItem('mock_session');
+        const email = localSess ? JSON.parse(localSess).user.email : 'Thomas@naughtysociety.ai';
         return { data: { session: { user: { email } } }, error: null };
       },
       onAuthStateChange: (cb) => {
-        const email = 'github-team@naughtysociety.ai';
+        const localSess = localStorage.getItem('mock_session');
+        const email = localSess ? JSON.parse(localSess).user.email : 'Thomas@naughtysociety.ai';
         setTimeout(() => cb('SIGNED_IN', { user: { email } }), 0);
         return { data: { subscription: { unsubscribe: () => {} } } };
       },
@@ -110,8 +111,14 @@ if (githubPat && githubPat.trim() !== '') {
             console.log('[GitHub DB] Fetching tasks from GitHub Issues...');
             const res = await fetch(`https://api.github.com/repos/${githubRepo}/issues?state=open&per_page=100`, { headers });
             if (!res.ok) {
-              console.error('Failed to fetch GitHub issues:', await res.text());
-              return { data: [], error: { message: 'GitHub API error' } };
+              const errText = await res.text();
+              console.error('Failed to fetch GitHub issues:', errText);
+              if (res.status === 401 || res.status === 403 || res.status === 404) {
+                alert(`GitHub Connection Error (${res.status})! Your Personal Access Token might be invalid, expired, or doesn't have access to this repo. Reconnecting in offline mode so you do not lose access!`);
+                localStorage.removeItem('github_pat');
+                window.location.reload();
+              }
+              return { data: [], error: { message: 'GitHub API error: ' + res.status } };
             }
             const issues = await res.json();
             const tasks = [];
@@ -191,7 +198,14 @@ if (githubPat && githubPat.trim() !== '') {
               }
               
               if (!res.ok) {
-                console.error('GitHub upsert issue failed:', await res.text());
+                const errText = await res.text();
+                console.error('GitHub upsert issue failed:', errText);
+                if (res.status === 401 || res.status === 403 || res.status === 404) {
+                  alert(`GitHub Write Error (${res.status})! Your token does not have write permissions for this repository. Switching to offline mode...`);
+                  localStorage.removeItem('github_pat');
+                  window.location.reload();
+                  return { error: { message: 'Write permission error: ' + res.status } };
+                }
               } else {
                 console.log('[GitHub DB] Successfully upserted issue!');
               }
