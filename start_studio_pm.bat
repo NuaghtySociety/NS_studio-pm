@@ -21,9 +21,16 @@ start "NS Studio PM Server" /min python -m http.server 9100
 :: Wait 1 second for server to initialize
 ping -n 2 127.0.0.1 >nul
 
-:: Open browser
-echo Launching Studio PM in default browser...
-start http://localhost:9100/index.html
+:: Launch Google Chrome explicitly if installed in standard paths
+echo Launching Studio PM in Google Chrome...
+if exist "C:\Program Files\Google\Chrome\Application\chrome.exe" (
+    start "" "C:\Program Files\Google\Chrome\Application\chrome.exe" "http://localhost:9100/index.html"
+) else if exist "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" (
+    start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" "http://localhost:9100/index.html"
+) else (
+    :: Fallback to default system browser if Chrome is not found
+    start http://localhost:9100/index.html
+)
 
 echo.
 echo Local server is running in the background.
