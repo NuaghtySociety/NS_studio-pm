@@ -329,16 +329,14 @@ if (githubPat && githubPat.trim() !== '') {
       },
       signInWithPassword: async ({ email, password }) => {
         const users = getUsers();
-        const user = users.find(u => u.email === email && u.password === password);
+        let user = users.find(u => u.email.toLowerCase() === email.toLowerCase());
         if (!user) {
-          if (users.length === 0) {
-            users.push({ email, password });
-            saveUsers(users);
-            const session = { user: { email } };
-            saveSession(session);
-            return { data: { session }, error: null };
-          }
-          return { data: { session: null }, error: { message: 'Invalid email or password.' } };
+          // Auto-register any new email instantly for maximum convenience!
+          user = { email, password };
+          users.push(user);
+          saveUsers(users);
+        } else if (user.password !== password) {
+          return { data: { session: null }, error: { message: 'Invalid password.' } };
         }
         const session = { user: { email } };
         saveSession(session);
