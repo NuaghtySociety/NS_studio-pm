@@ -123,6 +123,12 @@ if (githubPat && githubPat.trim() !== '') {
             const issues = await res.json();
             const tasks = [];
             
+            // Locate local Adidas project spelling to normalize IDs dynamically!
+            const localProjsStr = localStorage.getItem('studio_projects');
+            const localProjs = localProjsStr ? JSON.parse(localProjsStr) : [];
+            const activeAdidasProj = localProjs.find(p => p.id === 'adidas' || p.id === 'addidas' || p.name.toLowerCase().includes('adidas') || p.name.toLowerCase().includes('addidas'));
+            const localAdidasId = activeAdidasProj ? activeAdidasProj.id : 'adidas';
+
             issues.forEach(issue => {
               const body = issue.body || '';
               const match = body.match(/<!-- studio-pm-meta (.*?) -->/);
@@ -130,9 +136,15 @@ if (githubPat && githubPat.trim() !== '') {
                 try {
                   const meta = JSON.parse(match[1]);
                   issueNumberMap[meta.id] = issue.number;
+                  
+                  let taskProjId = meta.projectId;
+                  if (taskProjId === 'adidas' || taskProjId === 'addidas') {
+                    taskProjId = localAdidasId;
+                  }
+
                   tasks.push({
                     id: meta.id,
-                    projectId: meta.projectId,
+                    projectId: taskProjId,
                     phase: meta.phase,
                     title: issue.title,
                     assignee: meta.assignee,
@@ -160,9 +172,14 @@ if (githubPat && githubPat.trim() !== '') {
           for (const r of rows) {
             const issueNumber = r.fields?.github_issue_number || issueNumberMap[r.id];
             
+            let taskProjId = r.project_id;
+            if (taskProjId === 'adidas' || taskProjId === 'addidas') {
+              taskProjId = 'adidas'; // Always save as 'adidas' on GitHub for universal syncing!
+            }
+
             const meta = {
               id: r.id,
-              projectId: r.project_id,
+              projectId: taskProjId,
               phase: r.phase,
               assignee: r.assignee,
               dueDate: r.due_date,
