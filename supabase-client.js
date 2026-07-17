@@ -144,13 +144,13 @@ if (githubPat && githubPat.trim() !== '') {
 
                   tasks.push({
                     id: meta.id,
-                    projectId: taskProjId,
+                    project_id: taskProjId,
                     phase: meta.phase,
                     title: issue.title,
                     assignee: meta.assignee,
-                    dueDate: meta.dueDate,
+                    due_date: meta.dueDate,
                     status: meta.status,
-                    trainingStatus: meta.trainingStatus,
+                    training_status: meta.trainingStatus,
                     description: body.replace(/<!-- studio-pm-meta .*? -->/s, '').trim(),
                     fields: Object.assign({}, meta.fields, { github_issue_number: issue.number })
                   });
