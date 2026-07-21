@@ -22,18 +22,36 @@ if (githubPat && githubPat.trim() !== '') {
   const issueNumberMap = {};
   const listeners = [];
 
-  const DEFAULT_TASKS = [
-    { id: 't1', project_id: 'nike', phase: 1, title: 'Caption 200 reference images for Nike campaign dataset', assignee: 'Thomas', due_date: '2026-06-18', status: 'Done', training_status: null, fields: { imageCount: 200, captioningMethod: 'Manual' } },
-    { id: 't2', project_id: 'nike', phase: 2, title: 'Prepare and export final training dataset — Nike x Future', assignee: 'Thomas', due_date: '2026-06-22', status: 'Done', training_status: null, fields: { targetResolution: '1024×1024', finalImageCount: 186, datasetPath: '/datasets/nike-x-future/v2_final.zip' } },
-    { id: 't3', project_id: 'nike', phase: 3, title: 'Train Nike x Future LoRA on Flux base — 2000 steps', assignee: 'Erik', due_date: '2026-06-25', status: 'Done', training_status: 'Complete', fields: { baseModel: 'Flux.1-dev', trainingSteps: 2000, trainingHardware: 'RunPod A100', outputModelPath: '/models/nike-x-future/lora_v3_step2000.safetensors' } },
-    { id: 't3b', project_id: 'nike', phase: 4, title: 'Draft creative brief & mood direction — Nike x Future', assignee: 'Thomas', due_date: '2026-06-26', status: 'Done', training_status: null, fields: { creativeBrief: 'Cinematic urban energy vs. editorial studio stillness — two directions to explore against the trained LoRA.', referenceBoards: '/refs/nike-x-future/moodboard_v2.pdf', approvedConcept: 'Pursue both directions into Exploration; cinematic urban is the lead.' } },
-    { id: 't4', project_id: 'nike', phase: 5, title: 'Explore prompt directions for Nike x Future — cinematic, editorial, abstract', assignee: 'Thomas', due_date: '2026-06-27', status: 'In Progress', training_status: null, fields: { generationTool: 'ComfyUI', promptLog: 'cinematic urban, 35mm, dusk rim-light, wet asphalt reflections // editorial studio, hard flash, seamless white', approvedDirections: 'Direction 3 (cinematic urban) + Direction 5 (studio hard flash)' } },
-    { id: 't5', project_id: 'nike', phase: 6, title: 'Generate final 80-image batch — direction 3 (cinematic urban)', assignee: 'Thomas', due_date: '2026-06-30', status: 'In Progress', training_status: null, fields: { generationTool: 'ComfyUI', outputFormat: '2048×2048 PNG', assetsGenerated: 80, assetsApproved: 54, outputFolderPath: '/deliverables/nike-x-future/batch_03/' } },
-    { id: 't5b', project_id: 'nike', phase: 7, title: 'Refine direction 3 selects — added grain/detail pass', assignee: 'Thomas', due_date: '2026-07-01', status: 'In Progress', training_status: null, fields: { refinementNotes: 'Second pass on the 54 approved selects — tightening skin detail and grain matching to reference.', iterationCount: 3, refinedAssetCount: 54 } },
-    { id: 't5c', project_id: 'nike', phase: 8, title: 'Upscale approved selects to delivery resolution', assignee: 'Erik', due_date: '2026-07-02', status: 'To Do', training_status: null, fields: { upscalingTool: 'Topaz Gigapixel', targetResolution: '3000×3000 px', assetsUpscaled: 0 } },
-    { id: 't6', project_id: 'nike', phase: 9, title: 'Package and name final assets for post — Nike x Future', assignee: 'Thomas', due_date: '2026-07-03', status: 'To Do', training_status: null, fields: { notes: 'Awaiting producer sign-off on direction 3 selects before handoff.' } },
-    { id: 't7', project_id: 'nike', phase: 10, title: 'Grade and retouch selected images', assignee: 'Erik', due_date: '2026-07-05', status: 'To Do', training_status: null, fields: { softwareUsed: 'Photoshop, DaVinci Resolve', outputFormatsRequired: '3000×3000 JPG, 1080p MP4', finalFileLocation: '/final/nike-x-future/' } },
-    { id: 't8', project_id: 'nike', phase: 10, title: 'Export final files in all required formats', assignee: 'Erik', due_date: '2026-07-06', status: 'To Do', training_status: null, fields: { softwareUsed: 'After Effects', outputFormatsRequired: '9:16 Stories cut, 1:1 feed cut', finalFileLocation: '/final/nike-x-future/exports/' } }
+      const DEFAULT_TASKS = [
+    { id: 'm1', project_id: 'adidas', phase: 1, title: '01 · Sketch & Look & Feel (Stage 1)', assignee: 'Thomas', due_date: '2026-08-07', status: 'To Do', training_status: null, description: `Establish creative direction, lighting, consistency, pose. Milestones:
+- Jul 31: First sketch presentation (18 sketches total)
+- Aug 3: Feedback deadline
+- Aug 6: Reworked sketch presentation
+- Aug 7: Feedback deadline`, fields: { start_date: '2026-07-31' } },
+    { id: 'm2', project_id: 'adidas', phase: 2, title: '02 · First Production Round (Stage 2)', assignee: 'Erik', due_date: '2026-08-18', status: 'To Do', training_status: null, description: `Low-res prioritised images. Milestones:
+- Aug 14: First production presentation (4-6 images)
+- Aug 14: Summer pause begins
+- Aug 18: Feedback deadline`, fields: { start_date: '2026-08-14' } },
+    { id: 'm3', project_id: 'adidas', phase: 3, title: '03 · Summer Pause & Restart (Stage 2/3)', assignee: 'Erik', due_date: '2026-09-02', status: 'To Do', training_status: null, description: `Production pause. Sep 2: Production restarts. Order set by priorities and feedback.`, fields: { start_date: '2026-08-14' } },
+    { id: 'm4', project_id: 'adidas', phase: 6, title: '04 · Production Rework (Stage 3)', assignee: 'Thomas', due_date: '2026-09-22', status: 'To Do', training_status: null, description: `Lock composition and grade. Milestones:
+- Sep 8: Reworked image presentation
+- Sep 14: Second production presentation (6 images)
+- Sep 15: Feedback deadline (preferred)
+- Sep 16: Feedback deadline (latest)
+- Sep 22: Final production presentation`, fields: { start_date: '2026-09-02' } },
+    { id: 'm5', project_id: 'adidas', phase: 7, title: '05 · Product Review & Sign-Off (Stage 4)', assignee: 'Erik', due_date: '2026-09-28', status: 'To Do', training_status: null, description: `adidas Product Manager final review (Wed Sep 24-25). Sep 28: Final image approval deadline. Scope: product shape, materials, logos & branding placement.`, fields: { start_date: '2026-09-23' } },
+    { id: 'm6', project_id: 'adidas', phase: 8, title: '06 · Final Dev & 16K Upscaling (Stage 5)', assignee: 'Thomas', due_date: '2026-10-21', status: 'To Do', training_status: null, description: `Final detailing, texture and upscaling. Milestones:
+- Oct 5-13: Final detailing & refining
+- Oct 14: Review presentation
+- Oct 15-21: Upscale to max 16K
+- Oct 21: Main image handover (uncropped PNGs)`, fields: { start_date: '2026-10-05' } },
+    { id: 'm7', project_id: 'adidas', phase: 10, title: '07 · Video Presentation & Remaining Images (Stage 6)', assignee: 'Thomas', due_date: '2026-10-23', status: 'To Do', training_status: null, description: `Milestones:
+- Oct 22: First video presentation (4K hero ratio)
+- Oct 23: Feedback deadline (selection, timing, accuracy)
+- Parallel: remaining/added-later images continue.`, fields: { start_date: '2026-10-22' } },
+    { id: 'm8', project_id: 'adidas', phase: 10, title: '08 · Final Asset Handover (Stage 7)', assignee: 'Erik', due_date: '2026-10-28', status: 'To Do', training_status: null, description: `Final Handover Target: October 28. Deliverables:
+- Video assets for More Digital post & sound
+- Remaining images & deprioritised assets.`, fields: { start_date: '2026-10-28' } }
   ];
 
   client = {
@@ -279,21 +297,36 @@ if (githubPat && githubPat.trim() !== '') {
   const listeners = [];
   const authListeners = [];
 
-  const DEFAULT_TASKS = [
-    { id: 't1', project_id: 'nike', phase: 1, title: 'Caption 200 reference images for Nike campaign dataset', assignee: 'Thomas', due_date: '2026-06-18', status: 'Done', training_status: null, fields: { imageCount: 200, captioningMethod: 'Manual' } },
-    { id: 't2', project_id: 'nike', phase: 2, title: 'Prepare and export final training dataset — Nike x Future', assignee: 'Thomas', due_date: '2026-06-22', status: 'Done', training_status: null, fields: { targetResolution: '1024×1024', finalImageCount: 186, datasetPath: '/datasets/nike-x-future/v2_final.zip' } },
-    { id: 't3', project_id: 'nike', phase: 3, title: 'Train Nike x Future LoRA on Flux base — 2000 steps', assignee: 'Erik', due_date: '2026-06-25', status: 'Done', training_status: 'Complete', fields: { baseModel: 'Flux.1-dev', trainingSteps: 2000, trainingHardware: 'RunPod A100', outputModelPath: '/models/nike-x-future/lora_v3_step2000.safetensors' } },
-    { id: 't3b', project_id: 'nike', phase: 4, title: 'Draft creative brief & mood direction — Nike x Future', assignee: 'Thomas', due_date: '2026-06-26', status: 'Done', training_status: null, fields: { creativeBrief: 'Cinematic urban energy vs. editorial studio stillness — two directions to explore against the trained LoRA.', referenceBoards: '/refs/nike-x-future/moodboard_v2.pdf', approvedConcept: 'Pursue both directions into Exploration; cinematic urban is the lead.' } },
-    { id: 't4', project_id: 'nike', phase: 5, title: 'Explore prompt directions for Nike x Future — cinematic, editorial, abstract', assignee: 'Thomas', due_date: '2026-06-27', status: 'In Progress', training_status: null, fields: { generationTool: 'ComfyUI', promptLog: 'cinematic urban, 35mm, dusk rim-light, wet asphalt reflections // editorial studio, hard flash, seamless white', approvedDirections: 'Direction 3 (cinematic urban) + Direction 5 (studio hard flash)' } },
-    { id: 't5', project_id: 'nike', phase: 6, title: 'Generate final 80-image batch — direction 3 (cinematic urban)', assignee: 'Thomas', due_date: '2026-06-30', status: 'In Progress', training_status: null, fields: { generationTool: 'ComfyUI', outputFormat: '2048×2048 PNG', assetsGenerated: 80, assetsApproved: 54, outputFolderPath: '/deliverables/nike-x-future/batch_03/' } },
-    { id: 't5b', project_id: 'nike', phase: 7, title: 'Refine direction 3 selects — added grain/detail pass', assignee: 'Thomas', due_date: '2026-07-01', status: 'In Progress', training_status: null, fields: { refinementNotes: 'Second pass on the 54 approved selects — tightening skin detail and grain matching to reference.', iterationCount: 3, refinedAssetCount: 54 } },
-    { id: 't5c', project_id: 'nike', phase: 8, title: 'Upscale approved selects to delivery resolution', assignee: 'Erik', due_date: '2026-07-02', status: 'To Do', training_status: null, fields: { upscalingTool: 'Topaz Gigapixel', targetResolution: '3000×3000 px', assetsUpscaled: 0 } },
-    { id: 't6', project_id: 'nike', phase: 9, title: 'Package and name final assets for post — Nike x Future', assignee: 'Thomas', due_date: '2026-07-03', status: 'To Do', training_status: null, fields: { notes: 'Awaiting producer sign-off on direction 3 selects before handoff.' } },
-    { id: 't7', project_id: 'nike', phase: 10, title: 'Grade and retouch selected images', assignee: 'Erik', due_date: '2026-07-05', status: 'To Do', training_status: null, fields: { softwareUsed: 'Photoshop, DaVinci Resolve', outputFormatsRequired: '3000×3000 JPG, 1080p MP4', finalFileLocation: '/final/nike-x-future/' } },
-    { id: 't8', project_id: 'nike', phase: 10, title: 'Export final files in all required formats', assignee: 'Erik', due_date: '2026-07-06', status: 'To Do', training_status: null, fields: { softwareUsed: 'After Effects', outputFormatsRequired: '9:16 Stories cut, 1:1 feed cut', finalFileLocation: '/final/nike-x-future/exports/' } },
-    { id: 'g1', project_id: 'gucci', phase: 1, title: 'Caption reference images — Gucci AW26 dataset', assignee: 'Thomas', due_date: '2026-06-20', status: 'Done', training_status: null, fields: { imageCount: 340, captioningMethod: 'Mixed' } },
-    { id: 'g2', project_id: 'gucci', phase: 2, title: 'Prepare and export final training dataset for Gucci AW26 LoRA', assignee: 'Thomas', due_date: '2026-06-24', status: 'In Progress', training_status: null, fields: { targetResolution: '1024×1024', finalImageCount: 340, datasetPath: '/datasets/gucci-aw26/v1_final.zip' } },
-    { id: 'g3', project_id: 'gucci', phase: 3, title: 'Train Gucci AW26 LoRA on SDXL base — 1500 steps', assignee: 'Erik', due_date: '2026-06-29', status: 'In Progress', training_status: 'Running', fields: { baseModel: 'SDXL 1.0', trainingSteps: 1500, trainingHardware: 'Local RTX 4090', outputModelPath: '—' } }
+      const DEFAULT_TASKS = [
+    { id: 'm1', project_id: 'adidas', phase: 1, title: '01 · Sketch & Look & Feel (Stage 1)', assignee: 'Thomas', due_date: '2026-08-07', status: 'To Do', training_status: null, description: `Establish creative direction, lighting, consistency, pose. Milestones:
+- Jul 31: First sketch presentation (18 sketches total)
+- Aug 3: Feedback deadline
+- Aug 6: Reworked sketch presentation
+- Aug 7: Feedback deadline`, fields: { start_date: '2026-07-31' } },
+    { id: 'm2', project_id: 'adidas', phase: 2, title: '02 · First Production Round (Stage 2)', assignee: 'Erik', due_date: '2026-08-18', status: 'To Do', training_status: null, description: `Low-res prioritised images. Milestones:
+- Aug 14: First production presentation (4-6 images)
+- Aug 14: Summer pause begins
+- Aug 18: Feedback deadline`, fields: { start_date: '2026-08-14' } },
+    { id: 'm3', project_id: 'adidas', phase: 3, title: '03 · Summer Pause & Restart (Stage 2/3)', assignee: 'Erik', due_date: '2026-09-02', status: 'To Do', training_status: null, description: `Production pause. Sep 2: Production restarts. Order set by priorities and feedback.`, fields: { start_date: '2026-08-14' } },
+    { id: 'm4', project_id: 'adidas', phase: 6, title: '04 · Production Rework (Stage 3)', assignee: 'Thomas', due_date: '2026-09-22', status: 'To Do', training_status: null, description: `Lock composition and grade. Milestones:
+- Sep 8: Reworked image presentation
+- Sep 14: Second production presentation (6 images)
+- Sep 15: Feedback deadline (preferred)
+- Sep 16: Feedback deadline (latest)
+- Sep 22: Final production presentation`, fields: { start_date: '2026-09-02' } },
+    { id: 'm5', project_id: 'adidas', phase: 7, title: '05 · Product Review & Sign-Off (Stage 4)', assignee: 'Erik', due_date: '2026-09-28', status: 'To Do', training_status: null, description: `adidas Product Manager final review (Wed Sep 24-25). Sep 28: Final image approval deadline. Scope: product shape, materials, logos & branding placement.`, fields: { start_date: '2026-09-23' } },
+    { id: 'm6', project_id: 'adidas', phase: 8, title: '06 · Final Dev & 16K Upscaling (Stage 5)', assignee: 'Thomas', due_date: '2026-10-21', status: 'To Do', training_status: null, description: `Final detailing, texture and upscaling. Milestones:
+- Oct 5-13: Final detailing & refining
+- Oct 14: Review presentation
+- Oct 15-21: Upscale to max 16K
+- Oct 21: Main image handover (uncropped PNGs)`, fields: { start_date: '2026-10-05' } },
+    { id: 'm7', project_id: 'adidas', phase: 10, title: '07 · Video Presentation & Remaining Images (Stage 6)', assignee: 'Thomas', due_date: '2026-10-23', status: 'To Do', training_status: null, description: `Milestones:
+- Oct 22: First video presentation (4K hero ratio)
+- Oct 23: Feedback deadline (selection, timing, accuracy)
+- Parallel: remaining/added-later images continue.`, fields: { start_date: '2026-10-22' } },
+    { id: 'm8', project_id: 'adidas', phase: 10, title: '08 · Final Asset Handover (Stage 7)', assignee: 'Erik', due_date: '2026-10-28', status: 'To Do', training_status: null, description: `Final Handover Target: October 28. Deliverables:
+- Video assets for More Digital post & sound
+- Remaining images & deprioritised assets.`, fields: { start_date: '2026-10-28' } }
   ];
 
   // Helper to load/save mock tasks
