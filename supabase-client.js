@@ -329,6 +329,7 @@ if (githubPat && githubPat.trim() !== '') {
         if (!res.data?.session) {
           const session = { user: { email } };
           localStorage.setItem('mock_session', JSON.stringify(session));
+          setTimeout(() => window.location.reload(), 50);
           return { data: { session }, error: null };
         }
         return res;
@@ -343,6 +344,7 @@ if (githubPat && githubPat.trim() !== '') {
           // Frictionless fallback so Thomas and Erik are never blocked by email confirmation!
           const session = { user: { email } };
           localStorage.setItem('mock_session', JSON.stringify(session));
+          setTimeout(() => window.location.reload(), 50);
           return { data: { session }, error: null };
         }
         return res;
