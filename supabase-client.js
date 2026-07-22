@@ -1,8 +1,11 @@
 // supabase-client.js
 
-// Check if real Supabase configuration is provided in localStorage or window
-const supabaseUrl = localStorage.getItem('SUPABASE_URL') || window.SUPABASE_URL;
-const supabaseKey = localStorage.getItem('SUPABASE_KEY') || window.SUPABASE_KEY;
+// Default Live Supabase Credentials (Naughty Society Studio PM)
+const LIVE_SUPABASE_URL = 'https://jffohmxwmvexbhtdthzn.supabase.co';
+const LIVE_SUPABASE_KEY = '[REDACTED]';
+
+const supabaseUrl = localStorage.getItem('SUPABASE_URL') || LIVE_SUPABASE_URL;
+const supabaseKey = localStorage.getItem('SUPABASE_KEY') || LIVE_SUPABASE_KEY;
 
 // Check if GitHub Configuration is provided in localStorage
 const githubPat = localStorage.getItem('github_pat');
